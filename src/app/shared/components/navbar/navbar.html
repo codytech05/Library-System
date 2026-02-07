@@ -1,0 +1,18 @@
+<nav class="navbar">
+  <div class="logo">Library Management</div>
+
+  <button class="menu-toggle" (click)="toggleMenu()">
+    ☰
+  </button>
+  
+  <ul class="nav-links" [class.active]="isMenuOpen">
+    <li><a routerLink="/dashboard" routerLinkActive="active" (click)="isMenuOpen=false">Dashboard</a></li>
+    <li><a routerLink="/books" routerLinkActive="active" (click)="isMenuOpen=false">Books</a></li>
+    <li><a routerLink="/issue" routerLinkActive="active" (click)="isMenuOpen=false">Issue</a></li>
+    <li><a routerLink="/received" routerLinkActive="active" (click)="isMenuOpen=false">Received</a></li>
+  <button class="logout" (click)="logout()">Logout</button>
+  
+  </ul>
+
+</nav>
+<router-outlet></router-outlet>

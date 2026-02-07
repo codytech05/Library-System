@@ -1,0 +1,104 @@
+<div class="main-container">
+    <h2 class="page-title">Library Issue Management</h2>
+
+    <div style="display: flex; gap: 20px; ">
+        <!-- <div>
+            <img src="assets/issue.png" alt="hgh" >
+        </div> -->
+        <form [formGroup]="issueForm" class="flex-form-container">
+            <div class="card-section ">
+                <label class="section-label"><b>Reader Details</b></label>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <input type="text" formControlName="readerName" placeholder="Reader's Name"
+                            class="custom-input">
+                        <small class="error"
+                            *ngIf="issueForm.get('readerName')?.touched && issueForm.get('readerName')?.invalid">
+                            Name is required.
+                        </small>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" formControlName="readerMobile" maxlength="10" placeholder="Mobile No"
+                            class="custom-input">
+                        <small class="error"
+                            *ngIf="issueForm.get('readerMobile')?.touched && issueForm.get('readerMobile')?.invalid">
+                            Valid 10-digit mobile is required.
+                        </small>
+                    </div>
+                    <div class="input-group full-width">
+                        <input type="text" formControlName="readerAddress" placeholder="Address" class="custom-input">
+                    </div>
+                </div>
+                <div style="margin-top: 15PX;">
+                    <label class="section-label"><b>Select Books (Max 3)</b></label>
+                    <ng-select [items]="allBooks" formControlName="selectedBookId" placeholder="Search Books..."
+                        class="custom-ng-select" (change)="onBookSelect($event)" [disabled]="selectedBooks.length >= 3">
+                        <ng-option *ngFor="let book of allBooks" [value]="book">
+                            {{ book.id || book.ID }} - {{ book.BOOK_NAME || book.name || book.bookName }}
+                        </ng-option>
+                    </ng-select>
+
+                    <div *ngIf="selectedBooks.length > 0" class="preview-container">
+                        <div *ngFor="let book of selectedBooks; let i = index" class="preview-item">
+                            <span>{{ book.label }}</span>
+                            <button type="button" class="remove-btn" (click)="removeBook(i)">×</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-save" (click)="saveIssue()"
+                    [disabled]="issueForm.invalid || selectedBooks.length === 0">
+                    {{ editId ? 'UPDATE RECORD' : 'SAVE RECORD' }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive" *ngIf="issuedRecords.length > 0">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>Date & Time</th>
+                    <th>Reader name</th>
+                    <th>Reader Number</th>
+                    <th>Address</th>
+                    <th>Selected Books</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let record of issuedRecords">
+                    <td>
+                        <button class="btn-edit" (click)="editRecord(record)">
+                            <i class="fa-solid fa-pen-to-square"></i>E
+                        </button>
+                        <button class="btn-delete" (click)="deleteRecord(record)">
+                            <i class="fa-solid fa-trash-can"></i>D
+                        </button>
+                    </td>
+                    <td>
+                        <span class="date-text">
+                            {{ record.DATE_TIME | date:'dd-MM-yyyy' }}
+                        </span>
+                        <br>
+                        <small class="time-text">
+                            {{ record.DATE_TIME | date:'hh:mm a' }}
+                        </small>
+                    </td>
+                    <td>
+                        <span class="reader-name">{{ record.READER_NAME }}</span>
+                    </td>
+                    <td>
+                        <span class="reader-phone">{{ record.READER_MOBILE_NO }}</span>
+                    </td>
+                    <td>
+                        <span>{{ record.ADDRESS }}</span>
+                    </td>
+                    <td>
+                        <span class="book-tag">{{ record.BOOKS }}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>

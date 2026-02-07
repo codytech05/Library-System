@@ -1,0 +1,156 @@
+<div class="book-main">
+  <div class="container" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2>Books</h2>
+      <button (click)="openPopup()" class="btn-add">+ Add New Book</button>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="showModal">
+      <div class="modal-content">
+        <button type="button" class="close-icon" (click)="closePopup()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h3>{{ isEditMode ? 'Update Book' : 'Add New Book' }}</h3>
+        <form [formGroup]="bookForm" (ngSubmit)="onSave()">
+
+          <input type="text" formControlName="BOOK_NAME" placeholder="Book Name">
+          <input type="text" formControlName="AUTHOR" placeholder="Author Name">
+
+          <div class="file-inputs">
+            <label>Front Photo:</label>
+            <input type="file" #frontInput (change)="onFileSelect($event, 'FRONT_IMAGE')">
+            <div *ngIf="frontPreview" class="preview-container">
+              <img [src]="frontPreview" class="preview-thumb">
+              <button type="button" class="delete-preview" (click)="removeImage('FRONT_IMAGE', frontInput)">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </button>
+            </div>
+
+            <label style="margin-top: 10px;">Back Photo:</label>
+            <input type="file" #backInput (change)="onFileSelect($event, 'BACK_IMAGE')">
+            <div *ngIf="backPreview" class="preview-container">
+              <img [src]="backPreview" class="preview-thumb">
+              <button type="button" class="delete-preview" (click)="removeImage('BACK_IMAGE', backInput)">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <small *ngIf="backendError" style="color: red; display: block;">{{ backendError }}</small>
+
+          <div class="modal-actions">
+            <button type="submit" [disabled]="bookForm.invalid">
+              {{ isEditMode ? 'Update' : 'Save' }}
+            </button>
+            <button type="button" (click)="closePopup()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <hr>
+
+    <div *ngIf="isLoading" style="text-align: center; padding: 40px;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #2563eb;"></i>
+      <p style="margin-top: 10px; color: #475569; font-weight: 500;">Loading data, please wait...</p>
+    </div>
+
+    <div class="table-responsive">
+      <table border="1" *ngIf="!isLoading">
+        <thead>
+          <tr>
+            <th>Actions</th>
+            <th>ID</th>
+            <th>Book Name</th>
+            <th>Author</th>
+            <th>Photo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let book of booksList; let i = index">
+            <td>
+              <button class="btn-edit" (click)="onEdit(book)"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="btn-delete" (click)="onDelete(book.id)"><i class="fa-solid fa-trash"></i></button>
+            </td>
+            <td>{{ i + 1 }}</td>
+            <td>{{ book.BOOK_NAME }}</td>
+            <td>{{ book.AUTHOR }}</td>
+            <td>
+              <button class="view-link" *ngIf="book.FRONT_IMAGE || book.BACK_IMAGE; else noImage"
+                (click)="openImagePreview(book)">
+                <i class="fa-solid fa-image"></i> View Photos
+              </button>
+              <ng-template #noImage>
+                <span class="no-img-text">No image selected</span>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="showModal">
+      <div class="modal-content">
+        <button type="button" class="close-icon" (click)="closePopup()"><i class="fa-solid fa-xmark"></i></button>
+        <h3>{{ isEditMode ? 'Update Book' : 'Add New Book' }}</h3>
+
+        <form [formGroup]="bookForm" (ngSubmit)="onSave()">
+          <input type="text" formControlName="BOOK_NAME" placeholder="Book Name">
+          <input type="text" formControlName="AUTHOR" placeholder="Author Name">
+
+          <div class="file-inputs">
+            <label>Front Photo:</label>
+            <input type="file" #frontInput (change)="onFileSelect($event, 'FRONT_IMAGE')">
+            <div *ngIf="frontPreview" class="preview-container">
+              <img [src]="frontPreview" class="preview-thumb">
+              <button type="button" class="delete-preview" (click)="removeImage('FRONT_IMAGE', frontInput)">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </button>
+            </div>
+
+            <label style="margin-top: 10px;">Back Photo:</label>
+            <input type="file" #backInput (change)="onFileSelect($event, 'BACK_IMAGE')">
+            <div *ngIf="backPreview" class="preview-container">
+              <img [src]="backPreview" class="preview-thumb">
+              <button type="button" class="delete-preview" (click)="removeImage('BACK_IMAGE', backInput)">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" [disabled]="bookForm.invalid || isSubmitting" class="btn btn-primary">
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isSubmitting ? 'Updating...' : (isEditMode ? 'Update Book' : 'Add Book') }}
+            </button> <button type="button" (click)="closePopup()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div *ngIf="!isLoading && booksList.length === 0" style="text-align: center; padding: 20px;">
+      <p>No books found.</p>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="showImageModal">
+      <div class="modal-content preview-modal">
+        <button type="button" class="close-icon" (click)="closeImagePreview()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h3>{{ selectedBookImages.name }} - Photos</h3>
+        <hr>
+        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 15px;">
+          <div>
+            <p><b>Front Photo</b></p>
+            <img [src]="selectedBookImages.front" style="max-width: 250px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+          <div>
+            <p><b>Back Photo</b></p>
+            <img [src]="selectedBookImages.back" style="max-width: 250px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
