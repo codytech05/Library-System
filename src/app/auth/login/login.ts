@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component ,ViewEncapsulation } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth';
 import { Router } from '@angular/router';
@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LoginComponent {
   showPassword = false;

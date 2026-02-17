@@ -16,7 +16,7 @@
         <div class="password-wrapper">
           <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Enter password">
           <span class="toggle-icon" (click)="showPassword = !showPassword">
-            {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+              <i [class]="showPassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"></i>
           </span>
         </div>
       </div>

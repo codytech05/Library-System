@@ -27,6 +27,11 @@ export class Books implements OnInit {
   isLoading: boolean = false;
   isSubmitting: boolean = false;
 
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+
   showImageModal = false;
   selectedBookImages: any = { front: '', back: '' };
   baseUrl = 'http://192.168.1.136:8000/storage/books/';
@@ -54,12 +59,28 @@ export class Books implements OnInit {
     this.bookService.getBooks().subscribe({
       next: (res: any) => {
         this.booksList = res.books;
+        this.totalItems = this.booksList.length;
         this.isLoading = false;
       },
       error: () => {
         this.isLoading = false;
       },
     });
+  }
+
+  get paginatedBooks() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.booksList.slice(start, start + this.itemsPerPage);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
   }
   
   onFileSelect(event: any, field: string) {

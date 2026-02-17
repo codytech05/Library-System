@@ -6,7 +6,7 @@ import { Dashboard } from "./features/dashboard/dashboard";
 import { Books } from "./features/books/books";
 import { Issue } from "./features/issue/issue";
 import { Received } from "./features/received/received";
-
+import {PageNotFound} from './shared/page-not-found/page-not-found'
 export const routes: Routes = [ 
   { path: 'login', component: LoginComponent },
 
@@ -22,7 +22,5 @@ export const routes: Routes = [
     ] 
   }, 
 
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-
-  { path: '**', redirectTo: 'login' }
+  { path: '**', component: PageNotFound }
 ];

@@ -233,11 +233,13 @@ tbody tr:hover {
 /* Loading State */
 .loading-state {
   text-align: center;
+  margin: auto;
   padding: 40px;
   color: #475569;
 }
 
 .loading-state i {
+  margin: auto;
   font-size: 30px;
   color: #2563eb;
   margin-bottom: 10px;

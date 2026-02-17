@@ -1,0 +1,123 @@
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.content {
+  text-align: center;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.image-wrapper {
+  margin-bottom: 30px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.error-image {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+}
+
+
+
+.error-message {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+
+.btn-home {
+  padding: 15px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #667eea;
+  background: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-home:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  background: #f8f9ff;
+}
+
+.btn-home:active {
+  transform: translateY(-1px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .error-image {
+    max-width: 280px;
+  }
+
+  .error-code {
+    font-size: 80px;
+    letter-spacing: 5px;
+  }
+
+  .error-title {
+    font-size: 28px;
+  }
+
+  .error-message {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .btn-home {
+    padding: 12px 30px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .error-image {
+    max-width: 220px;
+  }
+
+  .error-code {
+    font-size: 60px;
+  }
+
+  .error-title {
+    font-size: 22px;
+  }
+
+  .error-message {
+    font-size: 14px;
+  }
+}
