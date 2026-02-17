@@ -1,30 +1,31 @@
 * {
-  box-sizing: border-box; 
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
 }
 
 .main-container {
-  max-width: 100%; 
+  max-width: 100%;
   margin: auto;
   padding: 20px;
   background: #f1f5f9;
   min-height: 100vh;
-  overflow-x: hidden; 
+  overflow-x: hidden;
 }
 
 .page-title {
   color: #0f172a;
   margin-bottom: 25px;
-  text-align: center;
+  font-size: 26px;
+}
+
+.form-wrapper {
+  display: flex;
+  gap: 20px;
 }
 
 .flex-form-container {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap; 
-  align-items: flex-start;
   width: 100%;
   max-width: 550px;
 }
@@ -39,12 +40,17 @@
 
 .section-label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   color: #475569;
   font-size: 14px;
 }
 
-/* Inputs Grid */
+/* Book Select Section - fixed capital PX */
+.book-select-section {
+  margin-top: 15px;
+}
+
+/* Input Grid */
 .input-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -55,20 +61,33 @@
   grid-column: span 2;
 }
 
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
 .custom-input {
   width: 100%;
-  padding: 10px;
+  padding: 10px 12px;
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   background: #f8fafc;
   outline: none;
   transition: 0.3s;
-  font-size: 14px; 
+  font-size: 14px;
+  color: #0f172a;
 }
-/* Save Button */
+
+.custom-input:focus {
+  border-color: #2563eb;
+  background: #fff;
+}
+
+/* Save Button - fixed: full width added */
 .btn-save {
   margin-top: 20px;
   padding: 12px;
+  width: 100%;
   border: none;
   border-radius: 10px;
   background: linear-gradient(135deg, #628fee, #4f46e5);
@@ -76,61 +95,81 @@
   font-weight: 600;
   cursor: pointer;
   transition: 0.3s;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 
 .btn-save:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .btn-save:disabled {
   background: #cbd5e1;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* Table Styling */
+/* Table */
 .table-responsive {
   width: 100%;
-  overflow-x: auto; 
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-top: 20px;
   background: #ffffff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; 
+  min-width: 600px;
 }
 
 thead {
   background: #f8fafc;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 th {
-  padding: 12px;
+  padding: 14px 12px;
   font-weight: 700;
   color: #475569;
   text-transform: uppercase;
   font-size: 12px;
-  text-align: center; /* Center aligned */
+  text-align: center;
 }
 
 td {
-  padding: 5px;
+  padding: 12px;
   font-size: 14px;
   color: #1e293b;
-  text-align: center; /* Center aligned */
+  text-align: center;
   border-bottom: 1px solid #f1f5f9;
 }
 
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Action Buttons  */
 .btn-edit {
   color: #2563eb;
-  margin-right: 12px;
+  margin-right: 10px;
   background: none;
   border: none;
   cursor: pointer;
+  font-size: 16px;       
+  transition: all 0.3s;
+  padding: 4px;
+}
+
+.btn-edit:hover {
+  color: #1e40af;
+  transform: scale(1.15);
 }
 
 .btn-delete {
@@ -138,99 +177,83 @@ td {
   background: none;
   border: none;
   cursor: pointer;
+  font-size: 16px;       
+  transition: all 0.3s;
+  padding: 4px;
 }
 
-/* Book Tags in Table */
-.book-tag {
-  display: inline-block;
-  background: #f1f5f9;
-  padding: 4px 10px;
-  font-size: 15px;
-  margin: 2px;
-  gap: 5px;
- }
+.btn-delete:hover {
+  color: #dc2626;
+  transform: scale(1.15);
+}
 
-/* Date & Time Text */
+/* Date & Time */
 .date-text {
   font-weight: 600;
   color: #0f172a;
+  font-size: 13px;
 }
 
 .time-text {
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 11px;
 }
 
+/* Reader Info */
+.reader-name {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.reader-phone {
+  color: #475569;
+  font-size: 13px;
+}
+
+/* Book Tag */
+.book-tag {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1e40af;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin: 2px;
+  border: 1px solid #dbeafe;
+}
+
+/* Error */
 .error {
   color: #ef4444;
   font-size: 11px;
   margin-top: 4px;
+  display: block;
 }
 
-/* Mobile Responsive Updates */
-@media (max-width: 786px) {
-  .main-container {
-    padding: 10px;
-  }
-  
-  .flex-form-container {
-    flex-direction: column;
-  }
-  
-  .card-section {
-    padding: 15px;
-  }
-
-  .input-grid {
-    grid-template-columns: 1fr; 
-  }
-  
-  .full-width {
-    grid-column: span 1;
-  }
-
-  .master-table th, .master-table td {
-    padding: 10px 5px;
-    font-size: 13px;
-  }
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: #475569;
 }
 
-/* --- ng-select Dropdown Panel Styling --- */
-::ng-deep .ng-dropdown-panel {
-  border-radius: 12px !important;
-  border: 1.5px solid #e2e8f0 !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
-  margin-top: 5px !important;
-  background-color: #ffffff !important;
-  overflow: hidden !important;
+.loading-state i {
+  font-size: 30px;
+  color: #2563eb;
+  margin-bottom: 10px;
+  display: block;
 }
 
-::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
-  padding: 12px 15px !important;
-  font-size: 14px !important;
-  color: #475569 !important;
-  border-bottom: 1px solid #f1f5f9 !important;
-}
-
-::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-  background-color: #eff6ff !important;
-  color: #2563eb !important;
-}
-
-/* ng-select Custom Styling */
-::ng-deep .custom-ng-select {
-  width: 100% !important;
-}
-
-::ng-deep .custom-ng-select .ng-select-container {
-  border-radius: 10px !important;
-  border: 1.5px solid #e2e8f0 !important;
-  background: #f8fafc !important;
-  padding: 5px !important;
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 16px;
 }
 
 /* Selected Books Preview */
-.preview-container {
+.selected-books-preview {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
@@ -239,12 +262,12 @@ td {
 
 .preview-item {
   background: #eff6ff;
-  padding: 6px 9px;
-  border-radius: 5px;
+  padding: 8px 12px;
+  border-radius: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
+  font-size: 12px;
   color: #1e40af;
   border-left: 3px solid #2563eb;
 }
@@ -254,7 +277,124 @@ td {
   color: #fff;
   border: none;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* ng-select Styling  */
+.ng-dropdown-panel {
+  border-radius: 12px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  margin-top: 5px !important;
+  background-color: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  padding: 12px 15px !important;
+  font-size: 14px !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+.custom-ng-select {
+  width: 100% !important;
+}
+
+.custom-ng-select .ng-select-container {
+  border-radius: 10px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  padding: 5px !important;
+  font-size: 14px !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .main-container {
+    padding: 15px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .form-wrapper {
+    flex-direction: column;
+  }
+
+  .flex-form-container {
+    max-width: 100%;
+  }
+
+  .card-section {
+    padding: 15px;
+  }
+
+  .input-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+
+  th, td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .btn-save {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-container {
+    padding: 10px;
+  }
+
+  .card-section {
+    padding: 12px;
+  }
+
+  .custom-input {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    font-size: 14px;
+    margin-right: 6px;
+  }
+
+  .date-text {
+    font-size: 12px;
+  }
+
+  .book-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
 }

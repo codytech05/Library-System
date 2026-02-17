@@ -3,33 +3,50 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .login-wrapper {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f2960, #380668);
+  background: 
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("/assets/login-bg.jpg");
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
 }
+
+
 
 .login-card {
   width: 100%;
-  max-width: 380px;
-  background: #b5b4d1;
+  max-width: 350px;
   padding: 30px 25px;
   border-radius: 14px;
+  background: white;
+  /* background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px); */
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.8s ease;
 }
 
+.login-header {
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  margin-bottom: 20px;
+}
+
+.login-logo {
+  width: 50px;
+}
+
 .login-card h2 {
   text-align: center;
-  margin-bottom: 25px;
   color: #1e293b;
-  font-size: 26px;
+  font-size: 30px;
 }
 
 .form-group {
@@ -44,13 +61,31 @@
   color: #334155;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
 .form-group input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: 10px;
   border: 1.5px solid #cbd5e1;
   font-size: 15px;
   outline: none;
+}
+
+.password-wrapper input {
+  padding-right: 45px;
+}
+
+.toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 20px;
+  user-select: none;
 }
 .login-btn {
   width: 100%;
@@ -72,11 +107,29 @@
 }
 
 .login-btn:disabled {
-  background: #94a3b8;
+  background: #337ce3;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
 }
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid white;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 /* Animation */
 @keyframes slideUp {

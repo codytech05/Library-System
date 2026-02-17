@@ -1,12 +1,9 @@
 <div class="main-container">
-    <h2 class="page-title">Library Issue Management</h2>
+    <h2 class="page-title">Issues Management</h2>
 
-    <div style="display: flex; gap: 20px; ">
-        <!-- <div>
-            <img src="assets/issue.png" alt="hgh" >
-        </div> -->
+    <div class="form-wrapper">
         <form [formGroup]="issueForm" class="flex-form-container">
-            <div class="card-section ">
+            <div class="card-section">
                 <label class="section-label"><b>Reader Details</b></label>
                 <div class="input-grid">
                     <div class="input-group">
@@ -29,22 +26,22 @@
                         <input type="text" formControlName="readerAddress" placeholder="Address" class="custom-input">
                     </div>
                 </div>
-                <div style="margin-top: 15PX;">
+
+                <div class="book-select-section">
                     <label class="section-label"><b>Select Books (Max 3)</b></label>
-                    <ng-select [items]="allBooks" formControlName="selectedBookId" placeholder="Search Books..."
-                        class="custom-ng-select" (change)="onBookSelect($event)" [disabled]="selectedBooks.length >= 3">
-                        <ng-option *ngFor="let book of allBooks" [value]="book">
-                            {{ book.id || book.ID }} - {{ book.BOOK_NAME || book.name || book.bookName }}
-                        </ng-option>
+                    <ng-select [items]="allBooks" bindLabel="label" formControlName="selectedBookId"
+                        placeholder="Search Books..." class="custom-ng-select" (change)="onBookSelect($event)"
+                        [disabled]="selectedBooks.length >= 3" [clearable]="true">
                     </ng-select>
 
-                    <div *ngIf="selectedBooks.length > 0" class="preview-container">
+                    <div *ngIf="selectedBooks.length > 0" class="selected-books-preview">
                         <div *ngFor="let book of selectedBooks; let i = index" class="preview-item">
                             <span>{{ book.label }}</span>
                             <button type="button" class="remove-btn" (click)="removeBook(i)">×</button>
                         </div>
                     </div>
                 </div>
+
                 <button type="button" class="btn-save" (click)="saveIssue()"
                     [disabled]="issueForm.invalid || selectedBooks.length === 0">
                     {{ editId ? 'UPDATE RECORD' : 'SAVE RECORD' }}
@@ -53,13 +50,20 @@
         </form>
     </div>
 
-    <div class="table-responsive" *ngIf="issuedRecords.length > 0">
-        <table border="1">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Loading data, please wait...</p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive" *ngIf="issuedRecords.length > 0 && !isLoading">
+        <table>
             <thead>
                 <tr>
                     <th>Actions</th>
                     <th>Date & Time</th>
-                    <th>Reader name</th>
+                    <th>Reader Name</th>
                     <th>Reader Number</th>
                     <th>Address</th>
                     <th>Selected Books</th>
@@ -68,21 +72,17 @@
             <tbody>
                 <tr *ngFor="let record of issuedRecords">
                     <td>
-                        <button class="btn-edit" (click)="editRecord(record)">
-                            <i class="fa-solid fa-pen-to-square"></i>E
+                        <button class="btn-edit" (click)="editRecord(record)" title="Edit">
+                            <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button class="btn-delete" (click)="deleteRecord(record)">
-                            <i class="fa-solid fa-trash-can"></i>D
+                        <button class="btn-delete" (click)="deleteRecord(record)" title="Delete">
+                            <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
                     <td>
-                        <span class="date-text">
-                            {{ record.DATE_TIME | date:'dd-MM-yyyy' }}
-                        </span>
+                        <span class="date-text">{{ formatDate(record.DATE_TIME) }}</span>
                         <br>
-                        <small class="time-text">
-                            {{ record.DATE_TIME | date:'hh:mm a' }}
-                        </small>
+                        <small class="time-text">{{ formatTime(record.DATE_TIME) }}</small>
                     </td>
                     <td>
                         <span class="reader-name">{{ record.READER_NAME }}</span>
@@ -99,6 +99,10 @@
                 </tr>
             </tbody>
         </table>
+    </div>
 
+    <!-- Empty State -->
+    <div *ngIf="issuedRecords.length === 0 && !isLoading" class="empty-state">
+        <p>No records found.</p>
     </div>
 </div>

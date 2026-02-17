@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -10,10 +10,9 @@ import { IssueService } from '../../core/services/issue.services';
   imports: [NgSelectModule, ReactiveFormsModule, CommonModule],
   templateUrl: './issue.html',
   styleUrl: './issue.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class Issue implements OnInit {
-  // public logoPath = "/src/img/issue.png";
-
   issueForm!: FormGroup;
   allBooks: any[] = [];
   selectedBooks: any[] = [];
@@ -21,13 +20,16 @@ export class Issue implements OnInit {
   editId: any = null;
   isLoading: boolean = false;
 
-  constructor(private issueService: IssueService, private fb: FormBuilder) {}
+  constructor(
+    private issueService: IssueService,
+    private fb: FormBuilder,
+  ) {}
 
   ngOnInit(): void {
     this.issueForm = this.fb.group({
       readerName: ['', [Validators.required, Validators.minLength(3)]],
       readerMobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      readerAddress: ['', [Validators.required]],
+      readerAddress: ['', Validators.required],
       selectedBookId: [null],
     });
 
@@ -35,36 +37,56 @@ export class Issue implements OnInit {
     this.fetchIssuedList();
   }
 
-  // Dropdown mate books fetch karvi
+  //  isLoading set karyel + label properly set karyel
   getBooksList() {
+    this.isLoading = true;
     this.issueService.getAllBooks().subscribe({
       next: (res: any) => {
         const data = Array.isArray(res) ? res : res.data;
         this.allBooks = data || [];
+        this.isLoading = false;
+        // console.log('Original First Book:', this.allBooks[0]);
       },
-      error: (err) => console.error('Books API Error', err),
+      error: (err) => {
+        console.error('Books API Error', err);
+        this.isLoading = false;
+      },
     });
   }
 
-  // Database mathi list fetch karvi
+  //  error handler add karyel
   fetchIssuedList() {
+    this.isLoading = true;
     this.issueService.getIssuedRecords().subscribe({
       next: (res: any) => {
-        this.issuedRecords = Array.isArray(res) ? res : res.data;
+        this.issuedRecords = Array.isArray(res) ? res : res.data || [];
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Issued Records Error', err);
+        this.isLoading = false;
       },
     });
   }
 
-  // Selection logic for Books
+  //  event.ID check + proper label set
   onBookSelect(event: any) {
-    if (event && this.selectedBooks.length < 3) {
-      if (!this.selectedBooks.find((b) => b.id === event.id)) {
-        this.selectedBooks.push(event);
-      } else {
-        alert('Already selected!');
-      }
-      this.issueForm.get('selectedBookId')?.setValue(null);
+    if (!event) return;
+
+    const bookId = event.id;
+    const bookLabel = event.label;
+    const alreadyAdded = this.selectedBooks.find((b) => b.id === bookId);
+
+    if (alreadyAdded) {
+      alert('This book is already selected!');
+    } else if (this.selectedBooks.length < 3) {
+      this.selectedBooks.push({
+        id: bookId,
+        label: bookLabel, // ✅ direct label use karo
+      });
     }
+
+    this.issueForm.get('selectedBookId')?.setValue(null);
   }
 
   removeBook(index: number) {
@@ -82,19 +104,23 @@ export class Issue implements OnInit {
       READER_NAME: this.issueForm.value.readerName,
       READER_MOBILE_NO: this.issueForm.value.readerMobile,
       ADDRESS: this.issueForm.value.readerAddress,
-      BOOK_IDS: this.selectedBooks.map((b) => b.id),
+      BOOK_IDS: this.selectedBooks.map((b) => b.id || b.ID),
     };
 
     this.issueService.saveIssueData(payload).subscribe({
       next: () => {
-        alert(this.editId ? 'Updated!' : 'Saved!');
+        alert(this.editId ? 'Record Updated!' : 'Record Saved!');
         this.fetchIssuedList();
         this.resetForm();
       },
-      error: () => alert('Backend Error'),
+      error: (err) => {
+        console.error('Save Error:', err);
+        alert('Something went wrong. Please try again.');
+      },
     });
   }
 
+  // BOOK_IDS undefined hoy to crash na thay
   editRecord(record: any) {
     this.editId = record.ISSUE_ID;
 
@@ -104,29 +130,52 @@ export class Issue implements OnInit {
       readerAddress: record.ADDRESS,
     });
 
-    this.selectedBooks = record.BOOK_IDS.map((id: number, index: number) => {
-      return {
+    //BOOK_IDS exist kare to j map karo
+    if (record.BOOK_IDS && Array.isArray(record.BOOK_IDS)) {
+      const bookNames = record.BOOKS ? record.BOOKS.split(',') : [];
+      this.selectedBooks = record.BOOK_IDS.map((id: number, index: number) => ({
         id: id,
-        label: record.BOOKS.split(',')[index]?.trim() || '',
-      };
-    });
+        ID: id,
+        label: `${id} - ${bookNames[index]?.trim() || 'Book ' + (index + 1)}`,
+      }));
+    } else {
+      this.selectedBooks = [];
+    }
   }
 
-    deleteRecord(record: any) {
-      const id = record.ISSUE_ID;
+  deleteRecord(record: any) {
+    const id = record.ISSUE_ID;
 
-      if (!id) {
-        alert('Delete ID not found!');
-        return;
-      }
-
-      if (confirm('Are you sure?')) {
-        this.issueService.deleteIssue(id).subscribe({
-          next: () => this.fetchIssuedList(),
-          error: (err) => console.log(err),
-        });
-      }
+    if (!id) {
+      alert('Delete ID not found!');
+      return;
     }
+
+    if (confirm('Are you sure you want to delete this record?')) {
+      this.issueService.deleteIssue(id).subscribe({
+        next: () => {
+          alert('Record deleted!');
+          this.fetchIssuedList();
+        },
+        error: (err) => {
+          console.error('Delete Error:', err);
+          alert('Delete failed. Please try again.');
+        },
+      });
+    }
+  }
+
+  formatDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const parts = dateStr.split(' ');
+    return parts[0]; // sirf date return karo
+  }
+
+  formatTime(dateStr: string): string {
+    if (!dateStr) return '';
+    const parts = dateStr.split(' ');
+    return parts[1] + ' ' + (parts[2] || ''); // time return karo
+  }
 
   resetForm() {
     this.issueForm.reset();

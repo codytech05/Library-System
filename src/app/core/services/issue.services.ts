@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class IssueService {
-  private getBooksUrl = 'http://192.168.1.136:8000/api/books/search/';
+  private getBooksUrl = 'http://192.168.1.136:8000/api/books-search';
   private issueUrl = 'http://192.168.1.136:8000/api/issue-books';
 
   constructor(private http: HttpClient) {}

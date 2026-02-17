@@ -2,16 +2,20 @@ import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
 export class LoginComponent {
+  showPassword = false;
+  isLoading = false;
+  
   loginForm = new FormGroup({
     username: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
@@ -21,6 +25,7 @@ export class LoginComponent {
 
   onLogin() {
     if (this.loginForm.valid) {
+      this.isLoading = true;
       const { username, password } = this.loginForm.value;
 
       const payload = {
@@ -32,6 +37,7 @@ export class LoginComponent {
 
       this.authService.login(payload).subscribe({
         next: (res: any) => {
+          this.isLoading = false;
           // --- AUTO-UPDATE: Token save karva mate niche ni lines ---
           if (res && res.token) {
             localStorage.setItem('token', res.token); // Aa line books access karva mate jaruri che
@@ -53,6 +59,7 @@ export class LoginComponent {
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
+          this.isLoading = false;
           console.error('API Response Error:', err);
           alert('Login Failed! Please check credentials.');
         },
