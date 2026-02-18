@@ -1,0 +1,104 @@
+<div class="reader-main">
+  <div class="container">
+    <div class="header-container">
+      <h2>Readers</h2>
+      <button (click)="openPopup()" class="btn-add">+ Add New Reader</button>
+    </div>
+
+    <!-- Add New Reader Modal -->
+    <div class="modal-backdrop" *ngIf="showModal">
+      <div class="modal-content">
+        <button type="button" class="close-icon" (click)="closePopup()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h3>{{ isEditMode ? 'Update Reader' : 'Add New Reader' }}</h3>
+        <form [formGroup]="readerForm" (ngSubmit)="onSave()">
+          <input type="text" formControlName="READER_NAME" placeholder="Reader Name">
+          <small *ngIf="readerForm.get('READER_NAME')?.touched && readerForm.get('READER_NAME')?.invalid" style="color: red;">
+            Name is required (letters only)
+          </small>
+
+          <input type="text" formControlName="MOBILE_NO" placeholder="Mobile Number" maxlength="10">
+          <small *ngIf="readerForm.get('MOBILE_NO')?.touched && readerForm.get('MOBILE_NO')?.invalid" style="color: red;">
+            Valid 10-digit mobile required
+          </small>
+
+          <textarea formControlName="ADDRESS" placeholder="Address" rows="3"></textarea>
+          <small *ngIf="readerForm.get('ADDRESS')?.touched && readerForm.get('ADDRESS')?.invalid" style="color: red;">
+            Address is required
+          </small>
+
+          <div class="modal-actions">
+            <button type="submit" [disabled]="readerForm.invalid || isReaderLoading">
+              <span *ngIf="!isReaderLoading">{{ isEditMode ? 'Update' : 'Save' }}</span>
+              <i *ngIf="isReaderLoading" class="fa-solid fa-spinner fa-spin"></i>
+            </button>
+            <button type="button" (click)="closePopup()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" style="text-align: center; padding: 40px;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #2563eb;"></i>
+      <p style="margin-top: 10px; color: #475569; font-weight: 500;">Loading data, please wait...</p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive" *ngIf="!isLoading">
+      <table>
+        <thead>
+          <tr>
+            <th>Actions</th>
+            <th>ID</th>
+            <th>Reader Name</th>
+            <th>Mobile Number</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let reader of readersList; let i = index">
+            <td>
+              <button class="btn-edit" (click)="onEdit(reader)">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="btn-delete" (click)="onDelete(reader.id)">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+            <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td>{{ reader.READER_NAME }}</td>
+            <td>{{ reader.MOBILE_NO }}</td>
+            <td>{{ reader.ADDRESS }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="!isLoading && totalPages > 1">
+      <div class="total-count">Total: {{ totalItems }} readers</div>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(1)">First</button>
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)"> &lt; </button>
+        <button *ngFor="let page of pageNumbers" 
+                class="page-btn" 
+                [class.active]="page === currentPage" 
+                (click)="changePage(page)">
+          {{ page }}
+        </button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)"> &gt; </button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(totalPages)">Last</button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && readersList.length === 0" style="text-align: center; padding: 40px;">
+      <p style="color: #94a3b8; font-size: 16px;">No readers found. Click "+ Add New Reader" to get started.</p>
+    </div>
+  </div>
+</div>

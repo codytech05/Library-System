@@ -19,6 +19,7 @@ export class Issue implements OnInit {
   issuedRecords: any[] = [];
   editId: any = null;
   isLoading: boolean = false;
+  isIssueLoading: boolean = false;
 
   constructor(
     private issueService: IssueService,
@@ -79,10 +80,10 @@ export class Issue implements OnInit {
 
     if (alreadyAdded) {
       alert('This book is already selected!');
-    } else if (this.selectedBooks.length < 3) {
+    } else {
       this.selectedBooks.push({
         id: bookId,
-        label: bookLabel, // ✅ direct label use karo
+        label: bookLabel,
       });
     }
 
@@ -99,6 +100,7 @@ export class Issue implements OnInit {
       return;
     }
 
+    this.isIssueLoading = true;
     const payload = {
       ISSUE_ID: this.editId,
       READER_NAME: this.issueForm.value.readerName,
@@ -109,11 +111,13 @@ export class Issue implements OnInit {
 
     this.issueService.saveIssueData(payload).subscribe({
       next: () => {
+        this.isIssueLoading = false;
         alert(this.editId ? 'Record Updated!' : 'Record Saved!');
         this.fetchIssuedList();
         this.resetForm();
       },
       error: (err) => {
+        this.isIssueLoading = false;
         console.error('Save Error:', err);
         alert('Something went wrong. Please try again.');
       },
@@ -177,6 +181,10 @@ export class Issue implements OnInit {
     return parts[1] + ' ' + (parts[2] || ''); // time return karo
   }
 
+  closePopup() {
+    this.resetForm()
+    
+  }
   resetForm() {
     this.issueForm.reset();
     this.selectedBooks = [];

@@ -83,22 +83,27 @@
   background: #fff;
 }
 
-/* Save Button - fixed: full width added */
-.btn-save {
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 12px;
   margin-top: 20px;
-  padding: 12px;
-  width: 100%;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #628fee, #4f46e5);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-  font-size: 14px;
-  letter-spacing: 0.5px;
 }
 
+.modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s ease;
+  font-size: 14px;
+}
+.btn-save {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+}
 .btn-save:hover {
   opacity: 0.9;
   transform: translateY(-1px);
@@ -106,10 +111,8 @@
 }
 
 .btn-save:disabled {
-  background: #cbd5e1;
+  opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 /* Table */
@@ -162,7 +165,7 @@ tbody tr:hover {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;       
+  font-size: 16px;
   transition: all 0.3s;
   padding: 4px;
 }
@@ -177,7 +180,7 @@ tbody tr:hover {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;       
+  font-size: 16px;
   transition: all 0.3s;
   padding: 4px;
 }
@@ -189,13 +192,13 @@ tbody tr:hover {
 
 /* Date & Time */
 .date-text {
-  font-weight: 600;
+  font-weight: 400;
   color: #0f172a;
   font-size: 13px;
 }
 
 .time-text {
-  color: #94a3b8;
+  color: #31363e;
   font-size: 11px;
 }
 
@@ -306,7 +309,7 @@ tbody tr:hover {
 }
 
 .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
-  padding: 12px 15px !important;
+  padding: 10px 12px !important;
   font-size: 14px !important;
   color: #475569 !important;
   border-bottom: 1px solid #f1f5f9 !important;
@@ -325,7 +328,7 @@ tbody tr:hover {
   border-radius: 10px !important;
   border: 1.5px solid #e2e8f0 !important;
   background: #f8fafc !important;
-  padding: 5px !important;
+  padding: 8px !important;
   font-size: 14px !important;
 }
 
@@ -360,7 +363,8 @@ tbody tr:hover {
     grid-column: span 1;
   }
 
-  th, td {
+  th,
+  td {
     padding: 8px 6px;
     font-size: 12px;
   }
@@ -398,5 +402,11 @@ tbody tr:hover {
   .book-tag {
     font-size: 11px;
     padding: 3px 8px;
+  }
+  .modal-actions button {
+    padding: 5px;
+    border-radius: 18px;
+    font-weight: 500;
+    font-size: 12px;
   }
 }

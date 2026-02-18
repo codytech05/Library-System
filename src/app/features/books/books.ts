@@ -25,12 +25,13 @@ export class Books implements OnInit {
   backendError: string = '';
   showModal = false;
   isLoading: boolean = false;
-  isSubmitting: boolean = false;
+  isBookLoading = false;
 
   // Pagination
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
+  totalPages = 0;
 
   showImageModal = false;
   selectedBookImages: any = { front: '', back: '' };
@@ -56,10 +57,11 @@ export class Books implements OnInit {
 
   getAllBooks() {
     this.isLoading = true;
-    this.bookService.getBooks().subscribe({
+    this.bookService.getBooks(this.currentPage, this.itemsPerPage).subscribe({
       next: (res: any) => {
-        this.booksList = res.books;
-        this.totalItems = this.booksList.length;
+        this.booksList = res.books || [];
+        this.totalItems = res.total_books || 0;
+        this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
         this.isLoading = false;
       },
       error: () => {
@@ -68,19 +70,33 @@ export class Books implements OnInit {
     });
   }
 
-  get paginatedBooks() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    return this.booksList.slice(start, start + this.itemsPerPage);
-  }
-
-  get totalPages() {
-    return Math.ceil(this.totalItems / this.itemsPerPage);
-  }
-
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.getAllBooks();
     }
+  }
+
+  get pageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 3;
+    
+    if (this.totalPages <= maxVisible) {
+      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    }
+    
+    let start = Math.max(1, this.currentPage - 2);
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
   }
   
   onFileSelect(event: any, field: string) {
@@ -115,8 +131,8 @@ export class Books implements OnInit {
   onSave() {
     if (this.bookForm.valid) {
       this.backendError = '';
+      this.isBookLoading = true;
       const formData = new FormData();
-
       // ID handle 
       const idValue = this.bookForm.get('id')?.value;
       if (idValue) {
@@ -147,12 +163,12 @@ export class Books implements OnInit {
         // UPDATE Logic
         this.bookService.updateBook(Number(idValue), formData).subscribe({
           next: () => {
-            this.isSubmitting = false;
+            this.isBookLoading = false;
             this.Toast.fire({ icon: 'success', title: 'Book Updated successfully' });
             this.closePopup();
           },
           error: (err: any) => {
-            this.isSubmitting = false;
+            this.isBookLoading = false;
             this.backendError = err.error?.message || 'Update failed';
           },
         });
@@ -160,10 +176,12 @@ export class Books implements OnInit {
         // CREATE Logic
         this.bookService.addBook(formData).subscribe({
           next: () => {
+            this.isBookLoading = false;
             this.Toast.fire({ icon: 'success', title: 'Book Added successfully' });
             this.closePopup();
           },
           error: (err: any) => {
+            this.isBookLoading = false;
             this.backendError = err.error?.message || 'Error saving book';
           },
         });

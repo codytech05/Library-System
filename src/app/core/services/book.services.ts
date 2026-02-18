@@ -15,8 +15,8 @@ export class BookService {
     });
   } 
 
-  getBooks() {
-    return this.http.get(this.apiUrl, { headers: this.getHeaders() });
+  getBooks(page: number = 1, perPage: number = 10) {
+    return this.http.get(`${this.apiUrl}?page=${page}&per_page=${perPage}`, { headers: this.getHeaders() });
   }
 
   addBook(data: any) {

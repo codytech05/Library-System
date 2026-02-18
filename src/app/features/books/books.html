@@ -42,9 +42,9 @@
             }}</small>
 
           <div class="modal-actions">
-            <button type="submit" [disabled]="bookForm.invalid || isSubmitting">
-              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isSubmitting ? 'Processing...' : (isEditMode ? 'Update' : 'Save') }}
+            <button type="submit" [disabled]="bookForm.invalid || isBookLoading">
+              <span *ngIf="!isBookLoading">{{ isEditMode ? 'Update' : 'Save' }}</span>
+              <i *ngIf="isBookLoading" class="spinner"></i>
             </button>
             <button type="button" (click)="closePopup()">Cancel</button>
           </div>
@@ -73,7 +73,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let book of paginatedBooks; let i = index">
+          <tr *ngFor="let book of booksList; let i = index">
             <td>
               <button class="btn-edit" (click)="onEdit(book)">
                 <i class="fa-solid fa-pen-to-square"></i>
@@ -101,9 +101,19 @@
 
     <!-- Pagination -->
     <div class="pagination-container" *ngIf="!isLoading && totalPages > 1">
-      <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)"> < </button>
-      <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)"> > </button>
+      <div class="total-count">Total: {{ totalItems }} books</div>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(1)">First</button>
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)"> &lt; </button>
+        <button *ngFor="let page of pageNumbers" 
+                class="page-btn" 
+                [class.active]="page === currentPage" 
+                (click)="changePage(page)">
+          {{ page }}
+        </button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)"> &gt; </button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(totalPages)">Last</button>
+      </div>
     </div>
 
     <!-- Empty State -->

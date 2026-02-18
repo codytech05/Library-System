@@ -1,7 +1,7 @@
 <div class="main-container">
-    <h2 class="page-title">Issues Management</h2>
+    <h2 class="page-title">Issues Books</h2>
 
-    <div class="form-wrapper">
+    <div class="form-wrapper"> 
         <form [formGroup]="issueForm" class="flex-form-container">
             <div class="card-section">
                 <label class="section-label"><b>Reader Details</b></label>
@@ -42,10 +42,14 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn-save" (click)="saveIssue()"
-                    [disabled]="issueForm.invalid || selectedBooks.length === 0">
-                    {{ editId ? 'UPDATE RECORD' : 'SAVE RECORD' }}
+               <div class="modal-actions">
+                 <button type="button" class="btn-save" (click)="saveIssue()"
+                    [disabled]="issueForm.invalid || selectedBooks.length === 0 || isIssueLoading">
+                    <span *ngIf="!isIssueLoading">{{ editId ? 'UPDATE' : 'SAVE' }}</span>
+                    <i *ngIf="isIssueLoading" class="spinner"></i>
                 </button>
+                <button type="button" (click)="closePopup()">Clear</button>
+               </div>
             </div>
         </form>
     </div>
@@ -63,10 +67,10 @@
                 <tr>
                     <th>Actions</th>
                     <th>Date & Time</th>
-                    <th>Reader Name</th>
-                    <th>Reader Number</th>
+                    <th>Issue Name</th>
+                    <th>Mobile Number</th>
                     <th>Address</th>
-                    <th>Selected Books</th>
+                    <th>Issues Books</th>
                 </tr>
             </thead>
             <tbody>
