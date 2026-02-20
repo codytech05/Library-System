@@ -22,8 +22,6 @@ export const routes: Routes = [
       { path: 'readers', component: Readers }, 
       { path: 'issue', component: Issue }, 
       { path: 'received', component: Received },
-      // નવા routes અહીં add કરો:
-      // { path: 'new-page', component: NewPageComponent },
     ] 
   }, 
 

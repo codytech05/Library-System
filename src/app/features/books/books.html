@@ -101,9 +101,9 @@
 
     <!-- Pagination -->
     <div class="pagination-container" *ngIf="!isLoading && totalPages > 1">
-      <div class="total-count">Total: {{ totalItems }} books</div>
+      <div class="total-count">Total: {{ totalItems }} </div>
       <div class="pagination-controls">
-        <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(1)">First</button>
+        <!-- <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(1)">First</button> -->
         <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)"> &lt; </button>
         <button *ngFor="let page of pageNumbers" 
                 class="page-btn" 
@@ -112,7 +112,7 @@
           {{ page }}
         </button>
         <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)"> &gt; </button>
-        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(totalPages)">Last</button>
+        <!-- <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(totalPages)">Last</button> -->
       </div>
     </div>
 

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
+import { ReadersService } from '../../core/services/readers.service'
 
 @Component({
   selector: 'app-readers',
@@ -23,7 +24,6 @@ export class Readers implements OnInit {
   showModal = false;
   isLoading = false;
   isReaderLoading = false;
-
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
@@ -37,7 +37,7 @@ export class Readers implements OnInit {
     timerProgressBar: true,
   });
 
-  constructor() {}
+  constructor(private readersService: ReadersService) {}
 
   ngOnInit() {
     this.getAllReaders();
@@ -45,13 +45,17 @@ export class Readers implements OnInit {
 
   getAllReaders() {
     this.isLoading = true;
-    // TODO: API call
-    setTimeout(() => {
-      this.readersList = [];
-      this.totalItems = 0;
-      this.totalPages = 0;
-      this.isLoading = false;
-    }, 500);
+    this.readersService.getAll(this.currentPage, this.itemsPerPage).subscribe({
+      next: (res) => {
+        this.readersList = res.data;        // <- tara API response mujab adjust karo
+        this.totalItems = res.totalItems;   // <- tara API response mujab adjust karo
+        this.totalPages = res.totalPages;   // <- tara API response mujab adjust karo
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+      }
+    });
   }
 
   openPopup() {
@@ -68,13 +72,37 @@ export class Readers implements OnInit {
   onSave() {
     if (this.readerForm.valid) {
       this.isReaderLoading = true;
-      // TODO: API call
-      setTimeout(() => {
-        this.isReaderLoading = false;
-        this.Toast.fire({ icon: 'success', title: this.isEditMode ? 'Reader Updated' : 'Reader Added' });
-        this.closePopup();
-        this.getAllReaders();
-      }, 1000);
+      const formData = this.readerForm.value;
+
+      if (this.isEditMode && formData.id) {
+        // UPDATE
+        this.readersService.update(formData.id, formData).subscribe({
+          next: () => {
+            this.isReaderLoading = false;
+            this.Toast.fire({ icon: 'success', title: 'Reader Updated' });
+            this.closePopup();
+            this.getAllReaders();
+          },
+          error: () => {
+            this.isReaderLoading = false;
+            this.Toast.fire({ icon: 'error', title: 'Update Failed' });
+          }
+        });
+      } else {
+        // CREATE
+        this.readersService.create(formData).subscribe({
+          next: () => {
+            this.isReaderLoading = false;
+            this.Toast.fire({ icon: 'success', title: 'Reader Added' });
+            this.closePopup();
+            this.getAllReaders();
+          },
+          error: () => {
+            this.isReaderLoading = false;
+            this.Toast.fire({ icon: 'error', title: 'Save Failed' });
+          }
+        });
+      }
     }
   }
 
@@ -85,10 +113,27 @@ export class Readers implements OnInit {
   }
 
   onDelete(id: number) {
-    if (confirm('Are you sure?')) {
-      // TODO: API call
-      this.getAllReaders();
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This reader will be permanently deleted!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.readersService.delete(id).subscribe({
+          next: () => {
+            this.Toast.fire({ icon: 'success', title: 'Reader Deleted' });
+            this.getAllReaders();
+          },
+          error: () => {
+            this.Toast.fire({ icon: 'error', title: 'Delete Failed' });
+          }
+        });
+      }
+    });
   }
 
   changePage(page: number) {
@@ -99,24 +144,17 @@ export class Readers implements OnInit {
   }
 
   get pageNumbers(): number[] {
-    const pages: number[] = [];
     const maxVisible = 5;
-    
     if (this.totalPages <= maxVisible) {
       return Array.from({ length: this.totalPages }, (_, i) => i + 1);
     }
-    
     let start = Math.max(1, this.currentPage - 2);
     let end = Math.min(this.totalPages, start + maxVisible - 1);
-    
     if (end - start < maxVisible - 1) {
       start = Math.max(1, end - maxVisible + 1);
     }
-    
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   }
 }

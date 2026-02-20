@@ -3,7 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { BookService } from '../../core/services/book.services';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
-
+ 
 @Component({
   selector: 'app-books',
   standalone: true,
@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
   styleUrl: './books.css',
 })
 export class Books implements OnInit {
+ 
   bookForm = new FormGroup({
     id: new FormControl(null),
     BOOK_NAME: new FormControl('', [Validators.required, Validators.pattern(/^[a-zA-Z ]*$/)]),
@@ -19,28 +20,26 @@ export class Books implements OnInit {
     FRONT_IMAGE: new FormControl(null),
     BACK_IMAGE: new FormControl(null),
   });
-
+ 
   booksList: any[] = [];
   isEditMode = false;
   backendError: string = '';
   showModal = false;
   isLoading: boolean = false;
   isBookLoading = false;
-
-  // Pagination
+ 
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
   totalPages = 0;
-
+ 
   showImageModal = false;
   selectedBookImages: any = { front: '', back: '' };
   baseUrl = 'http://192.168.1.136:8000/storage/books/';
-
-  // Preview mate variables
+ 
   frontPreview: string | null = null;
   backPreview: string | null = null;
-
+ 
   private Toast = Swal.mixin({
     toast: true,
     position: 'top-end',
@@ -48,13 +47,13 @@ export class Books implements OnInit {
     timer: 2000,
     timerProgressBar: true,
   });
-
+ 
   constructor(private bookService: BookService) {}
-
+ 
   ngOnInit() {
     this.getAllBooks();
   }
-
+ 
   getAllBooks() {
     this.isLoading = true;
     this.bookService.getBooks(this.currentPage, this.itemsPerPage).subscribe({
@@ -69,42 +68,41 @@ export class Books implements OnInit {
       },
     });
   }
-
+ 
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.getAllBooks();
     }
   }
-
+ 
   get pageNumbers(): number[] {
     const pages: number[] = [];
     const maxVisible = 3;
-    
+ 
     if (this.totalPages <= maxVisible) {
       return Array.from({ length: this.totalPages }, (_, i) => i + 1);
     }
-    
+ 
     let start = Math.max(1, this.currentPage - 2);
     let end = Math.min(this.totalPages, start + maxVisible - 1);
-    
+ 
     if (end - start < maxVisible - 1) {
       start = Math.max(1, end - maxVisible + 1);
     }
-    
+ 
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
-    
+ 
     return pages;
   }
-  
+ 
   onFileSelect(event: any, field: string) {
     const file = event.target.files[0];
     if (file) {
       this.bookForm.patchValue({ [field]: file } as any);
-
-      // File Reader for Preview
+ 
       const reader = new FileReader();
       reader.onload = () => {
         if (field === 'FRONT_IMAGE') this.frontPreview = reader.result as string;
@@ -113,7 +111,7 @@ export class Books implements OnInit {
       reader.readAsDataURL(file);
     }
   }
-
+ 
   openPopup() {
     this.isEditMode = false;
     this.bookForm.reset();
@@ -122,73 +120,74 @@ export class Books implements OnInit {
     this.backendError = '';
     this.showModal = true;
   }
-
+ 
   closePopup() {
     this.showModal = false;
     this.resetAll();
   }
-
+ 
   onSave() {
-    if (this.bookForm.valid) {
-      this.backendError = '';
-      this.isBookLoading = true;
-      const formData = new FormData();
-      // ID handle 
-      const idValue = this.bookForm.get('id')?.value;
-      if (idValue) {
-        formData.append('id', String(idValue));
-      }
-
-      formData.append('BOOK_NAME', this.bookForm.get('BOOK_NAME')?.value || '');
-      formData.append('AUTHOR', this.bookForm.get('AUTHOR')?.value || '');
-
-      // --- Front Image Logic ---
-      const frontImg: any = this.bookForm.get('FRONT_IMAGE')?.value;
-      if (frontImg instanceof File) {
-        formData.append('FRONT_IMAGE', frontImg);
-      } else if (this.isEditMode && !this.frontPreview) {
-        formData.append('FRONT_IMAGE', '');
-      }
-
-      // --- Back Image Logic ---
-      const backImg: any = this.bookForm.get('BACK_IMAGE')?.value;
-      if (backImg instanceof File) {
-        formData.append('BACK_IMAGE', backImg);
-      } else if (this.isEditMode && !this.backPreview) {
-        formData.append('BACK_IMAGE', '');
-      }
-
-      // API Call
-      if (this.isEditMode) {
-        // UPDATE Logic
-        this.bookService.updateBook(Number(idValue), formData).subscribe({
-          next: () => {
-            this.isBookLoading = false;
-            this.Toast.fire({ icon: 'success', title: 'Book Updated successfully' });
-            this.closePopup();
-          },
-          error: (err: any) => {
-            this.isBookLoading = false;
-            this.backendError = err.error?.message || 'Update failed';
-          },
-        });
-      } else {
-        // CREATE Logic
-        this.bookService.addBook(formData).subscribe({
-          next: () => {
-            this.isBookLoading = false;
-            this.Toast.fire({ icon: 'success', title: 'Book Added successfully' });
-            this.closePopup();
-          },
-          error: (err: any) => {
-            this.isBookLoading = false;
-            this.backendError = err.error?.message || 'Error saving book';
-          },
-        });
-      }
+    if (!this.bookForm.valid) return;
+ 
+    this.backendError = '';
+    this.isBookLoading = true;
+ 
+    const formData = new FormData();
+    const idValue = this.bookForm.get('id')?.value;
+ 
+    if (idValue) {
+      formData.append('id', String(idValue));
+    }
+ 
+    formData.append('BOOK_NAME', this.bookForm.get('BOOK_NAME')?.value || '');
+    formData.append('AUTHOR', this.bookForm.get('AUTHOR')?.value || '');
+ 
+    const frontImg: any = this.bookForm.get('FRONT_IMAGE')?.value;
+    if (frontImg instanceof File) {
+      formData.append('FRONT_IMAGE', frontImg);
+    }
+ 
+    const backImg: any = this.bookForm.get('BACK_IMAGE')?.value;
+    if (backImg instanceof File) {
+      formData.append('BACK_IMAGE', backImg);
+    }
+ 
+    if (this.isEditMode) {
+      this.bookService.updateBook(Number(idValue), formData).subscribe({
+        next: (res: any) => {
+          const index = this.booksList.findIndex(b => b.id === Number(idValue));
+          if (index !== -1) {
+            this.booksList[index] = res.book;
+          }
+ 
+          this.isBookLoading = false;
+          this.Toast.fire({ icon: 'success', title: 'Book Updated successfully' });
+          this.closePopup();
+        },
+        error: (err: any) => {
+          this.isBookLoading = false;
+          this.backendError = err.error?.message || 'Update failed';
+        },
+      });
+    } else {
+      this.bookService.addBook(formData).subscribe({
+        next: (res: any) => {
+          this.booksList.unshift(res.book); // ✅ Add at top
+          this.totalItems++;
+          this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+ 
+          this.isBookLoading = false;
+          this.Toast.fire({ icon: 'success', title: 'Book Added successfully' });
+          this.closePopup();
+        },
+        error: (err: any) => {
+          this.isBookLoading = false;
+          this.backendError = err.error?.message || 'Error saving book';
+        },
+      });
     }
   }
-
+ 
   onEdit(book: any) {
     this.isEditMode = true;
     this.showModal = true;
@@ -197,25 +196,28 @@ export class Books implements OnInit {
       BOOK_NAME: book.BOOK_NAME,
       AUTHOR: book.AUTHOR,
     });
-    // Edit વખતે જુના ફોટા દેખાય તે માટે
+ 
     this.frontPreview = book.FRONT_IMAGE ? this.baseUrl + book.FRONT_IMAGE : null;
     this.backPreview = book.BACK_IMAGE ? this.baseUrl + book.BACK_IMAGE : null;
   }
-
+ 
   onDelete(id: number) {
     if (confirm('Are you sure?')) {
-      this.bookService.deleteBook(id).subscribe(() => this.getAllBooks());
+      this.bookService.deleteBook(id).subscribe(() => {
+        this.booksList = this.booksList.filter(b => b.id !== id); // ✅ Remove single row
+        this.totalItems--;
+        this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+      });
     }
   }
-
+ 
   resetAll() {
     this.isEditMode = false;
     this.bookForm.reset();
     this.frontPreview = null;
     this.backPreview = null;
-    this.getAllBooks();
   }
-
+ 
   openImagePreview(book: any) {
     this.selectedBookImages = {
       front: this.baseUrl + book.FRONT_IMAGE,
@@ -224,17 +226,17 @@ export class Books implements OnInit {
     };
     this.showImageModal = true;
   }
-
+ 
   closeImagePreview() {
     this.showImageModal = false;
   }
-
+ 
   removeImage(field: string, inputElement: HTMLInputElement) {
     this.bookForm.patchValue({ [field]: null });
-
+ 
     if (field === 'FRONT_IMAGE') this.frontPreview = null;
     if (field === 'BACK_IMAGE') this.backPreview = null;
-
+ 
     inputElement.value = '';
   }
 }

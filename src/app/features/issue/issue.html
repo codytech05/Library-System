@@ -1,112 +1,121 @@
 <div class="main-container">
+  <div class="header-container">
     <h2 class="page-title">Issues Books</h2>
+    <button (click)="openPopup()" class="btn-add">+ Add New Issue</button>
+  </div>
 
-    <div class="form-wrapper"> 
-        <form [formGroup]="issueForm" class="flex-form-container">
-            <div class="card-section">
-                <label class="section-label"><b>Reader Details</b></label>
-                <div class="input-grid">
-                    <div class="input-group">
-                        <input type="text" formControlName="readerName" placeholder="Reader's Name"
-                            class="custom-input">
-                        <small class="error"
-                            *ngIf="issueForm.get('readerName')?.touched && issueForm.get('readerName')?.invalid">
-                            Name is required.
-                        </small>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" formControlName="readerMobile" maxlength="10" placeholder="Mobile No"
-                            class="custom-input">
-                        <small class="error"
-                            *ngIf="issueForm.get('readerMobile')?.touched && issueForm.get('readerMobile')?.invalid">
-                            Valid 10-digit mobile is required.
-                        </small>
-                    </div>
-                    <div class="input-group full-width">
-                        <input type="text" formControlName="readerAddress" placeholder="Address" class="custom-input">
-                    </div>
-                </div>
+  <hr>
 
-                <div class="book-select-section">
-                    <label class="section-label"><b>Select Books (Max 3)</b></label>
-                    <ng-select [items]="allBooks" bindLabel="label" formControlName="selectedBookId"
-                        placeholder="Search Books..." class="custom-ng-select" (change)="onBookSelect($event)"
-                        [disabled]="selectedBooks.length >= 3" [clearable]="true">
-                    </ng-select>
+  <!-- Modal Popup -->
+  <div class="modal-backdrop" *ngIf="showIssueModal">
+    <div class="modal-content">
+      <button type="button" class="close-icon" (click)="closePopup()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
 
-                    <div *ngIf="selectedBooks.length > 0" class="selected-books-preview">
-                        <div *ngFor="let book of selectedBooks; let i = index" class="preview-item">
-                            <span>{{ book.label }}</span>
-                            <button type="button" class="remove-btn" (click)="removeBook(i)">×</button>
-                        </div>
-                    </div>
-                </div>
+      <h3>{{ editId ? 'Update Issue' : 'Add New Issue' }}</h3>
 
-               <div class="modal-actions">
-                 <button type="button" class="btn-save" (click)="saveIssue()"
-                    [disabled]="issueForm.invalid || selectedBooks.length === 0 || isIssueLoading">
-                    <span *ngIf="!isIssueLoading">{{ editId ? 'UPDATE' : 'SAVE' }}</span>
-                    <i *ngIf="isIssueLoading" class="spinner"></i>
-                </button>
-                <button type="button" (click)="closePopup()">Clear</button>
-               </div>
+      <form [formGroup]="issueForm">
+
+        <label class="section-label"><b>Reader Details</b></label>
+
+        <input type="text" formControlName="readerName" placeholder="Reader's Name" class="form-input">
+        <small class="error" *ngIf="issueForm.get('readerName')?.touched && issueForm.get('readerName')?.invalid">
+          Name is required (min 3 characters).
+        </small>
+
+        <input type="text" formControlName="readerMobile" maxlength="10" placeholder="Mobile No" class="form-input">
+        <small class="error" *ngIf="issueForm.get('readerMobile')?.touched && issueForm.get('readerMobile')?.invalid">
+          Valid 10-digit mobile is required.
+        </small>
+
+        <input type="text" formControlName="readerAddress" placeholder="Address" class="form-input">
+        <small class="error" *ngIf="issueForm.get('readerAddress')?.touched && issueForm.get('readerAddress')?.invalid">
+          Address is required.
+        </small>
+
+        <div class="book-select-section">
+          <label class="section-label"><b>Select Books</b></label>
+          <ng-select
+            [items]="allBooks"
+            bindLabel="label"
+            formControlName="selectedBookId"
+            placeholder="Search Books..."
+            class="custom-ng-select"
+            (change)="onBookSelect($event)"
+            [disabled]="selectedBooks.length >= 3"
+            [clearable]="true">
+          </ng-select>
+
+          <div *ngIf="selectedBooks.length > 0" class="selected-books-preview">
+            <div *ngFor="let book of selectedBooks; let i = index" class="preview-item">
+              <span>{{ book.label }}</span>
+              <button type="button" class="remove-btn" (click)="removeBook(i)">×</button>
             </div>
-        </form>
-    </div>
+          </div>
+        </div>
 
-    <!-- Loading -->
-    <div *ngIf="isLoading" class="loading-state">
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        <p>Loading data, please wait...</p>
-    </div>
+        <small *ngIf="backendError" style="color: red; display: block; margin-bottom: 10px;">{{ backendError }}</small>
 
-    <!-- Table -->
-    <div class="table-responsive" *ngIf="issuedRecords.length > 0 && !isLoading">
-        <table>
-            <thead>
-                <tr>
-                    <th>Actions</th>
-                    <th>Date & Time</th>
-                    <th>Issue Name</th>
-                    <th>Mobile Number</th>
-                    <th>Address</th>
-                    <th>Issues Books</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let record of issuedRecords">
-                    <td>
-                        <button class="btn-edit" (click)="editRecord(record)" title="Edit">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="btn-delete" (click)="deleteRecord(record)" title="Delete">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                    <td>
-                        <span class="date-text">{{ formatDate(record.DATE_TIME) }}</span>
-                        <br>
-                        <small class="time-text">{{ formatTime(record.DATE_TIME) }}</small>
-                    </td>
-                    <td>
-                        <span class="reader-name">{{ record.READER_NAME }}</span>
-                    </td>
-                    <td>
-                        <span class="reader-phone">{{ record.READER_MOBILE_NO }}</span>
-                    </td>
-                    <td>
-                        <span>{{ record.ADDRESS }}</span>
-                    </td>
-                    <td>
-                        <span class="book-tag">{{ record.BOOKS }}</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-submit" (click)="saveIssue()"
+            [disabled]="issueForm.invalid || selectedBooks.length === 0 || isIssueLoading">
+            <span *ngIf="!isIssueLoading">{{ editId ? 'UPDATE' : 'SAVE' }}</span>
+            <i *ngIf="isIssueLoading" class="spinner"></i>
+          </button>
+          <button type="button" (click)="closePopup()">Cancel</button>
+        </div>
 
-    <!-- Empty State -->
-    <div *ngIf="issuedRecords.length === 0 && !isLoading" class="empty-state">
-        <p>No records found.</p>
+      </form>
     </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" style="text-align: center; padding: 40px;">
+    <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #2563eb;"></i>
+    <p style="margin-top: 10px; color: #475569; font-weight: 500;">Loading data, please wait...</p>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive" *ngIf="issuedRecords.length > 0 && !isLoading">
+    <table>
+      <thead>
+        <tr>
+          <th>Actions</th>
+          <th>Date & Time</th>
+          <th>Issue Name</th>
+          <th>Mobile Number</th>
+          <th>Address</th>
+          <th>Issues Books</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let record of issuedRecords">
+          <td>
+            <button class="btn-edit" (click)="editRecord(record)" title="Edit">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="btn-delete" (click)="deleteRecord(record)" title="Delete">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+          <td>
+            <span class="date-text">{{ formatDate(record.DATE_TIME) }}</span>
+            <br>
+            <small class="time-text">{{ formatTime(record.DATE_TIME) }}</small>
+          </td>
+          <td><span class="reader-name">{{ record.READER_NAME }}</span></td>
+          <td><span class="reader-phone">{{ record.READER_MOBILE_NO }}</span></td>
+          <td><span>{{ record.ADDRESS }}</span></td>
+          <td><span class="book-tag">{{ record.BOOKS }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="issuedRecords.length === 0 && !isLoading" style="text-align: center; padding: 40px;">
+    <p style="color: #94a3b8; font-size: 16px;">No records found. Click "+ Add New Issue" to get started.</p>
+  </div>
+
 </div>
